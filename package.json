@@ -1,0 +1,38 @@
+{
+  "name": "helpman-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gamified AI Placement Preparation Platform — AI-powered daily coding tasks via WhatsApp with XP, streaks, and leaderboards",
+  "author": "Divyanshu Singh",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:server": "npm run dev --workspace=apps/server",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "npx ts-node prisma/seed.ts",
+    "db:studio": "npx prisma studio",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0",
+    "prisma": "^6.9.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^22.15.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
