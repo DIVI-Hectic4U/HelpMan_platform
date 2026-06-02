@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────────────────────
+
+enum Rank {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  MASTER
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+// ── Models ────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String
+  passwordHash     String?
+  authProvider     String    @default("credentials")
+  whatsappNumber   String?   @unique
+  whatsappLinked   Boolean   @default(false)
+  leetcodeHandle   String?
+  codeforcesHandle String?
+  currentXp        Int       @default(0)
+  rank             Rank      @default(BRONZE)
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastActiveDate   DateTime?
+  role             Role      @default(USER)
+  consentGivenAt   DateTime?
+  tosAcceptedAt    DateTime?
+  tosVersion       String?
+  avatarUrl        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  tasks          DailyTask[]
+  xpTransactions XpTransaction[]
+  preferences    UserPreference?
+  profileCaches  ProfileCache[]
+
+  @@index([currentXp(sort: Desc), rank])
+}
+
+model DailyTask {
+  id          String     @id @default(uuid())
+  userId      String
+  taskDate    DateTime
+  problems    Json       // Array of { title, url, difficulty, topic, xpValue, platform }
+  status      TaskStatus @default(PENDING)
+  xpAwarded   Int        @default(0)
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, taskDate(sort: Desc)])
+  @@index([userId, status])
+}
+
+model XpTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Int
+  reason    String   // 'daily_solve', 'streak_bonus', 'rank_up', 'first_blood'
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model ProfileCache {
+  id             String   @id @default(uuid())
+  userId         String
+  platform       String   // 'codeforces' | 'leetcode'
+  rating         Int?
+  problemsSolved Int?
+  rawData        Json?
+  fetchedAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+}
+
+model UserPreference {
+  userId          String  @id
+  timezone        String  @default("Asia/Kolkata")
+  difficultyPref  String  @default("adaptive") // 'easy', 'medium', 'hard', 'adaptive'
+  dailyReminderAt String  @default("08:00")
+  notificationsOn Boolean @default(true)
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProblemBank {
+  id         String   @id @default(uuid())
+  platform   String   // 'codeforces' | 'leetcode'
+  problemId  String
+  title      String
+  url        String
+  difficulty Int      // numeric rating/difficulty level
+  topics     String[] // array of topic tags
+  verified   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@unique([platform, problemId])
+  @@index([platform, difficulty])
+}
