@@ -47,9 +47,13 @@
 
 ---
 
-## 🏗 Architecture
+## 🏗 Architecture & Deployment Scenario
 
-HelpMan is built on a modern, decoupled architecture designed for scale and responsiveness. It utilizes a **Next.js frontend** for a dynamic user dashboard, and an **Express.js backend** acting as the central nervous system for API integrations, AI task generation, and the Telegram bot.
+HelpMan is built on a modern, decoupled architecture designed for scale and responsiveness, and is currently fully deployed in a **production-ready environment**.
+
+- **Frontend (Vercel)**: A dynamic Next.js application that handles user authentication, the interactive dashboard, and administrative panels. It is deployed globally via Vercel's Edge Network for instant load times.
+- **Backend (Render)**: An Express.js REST API acting as the central nervous system. It continuously listens for Telegram Webhooks, interfaces with the Gemini AI API, and calculates Gamification logic (XP/Streaks).
+- **Database (Neon)**: A serverless PostgreSQL database managed via Prisma ORM, providing a persistent source of truth for user data and tasks.
 
 ### System Flow
 
@@ -60,13 +64,13 @@ graph TD
     Web((Web Dashboard User))
     
     %% Frontend
-    subgraph Frontend [Next.js Application]
-        Dashboard[User Dashboard]
+    subgraph Frontend [Vercel Deployment]
+        Dashboard[Next.js Dashboard]
         AdminPanel[Admin Panel]
     end
     
     %% Backend
-    subgraph Backend [Express API Server]
+    subgraph Backend [Render Web Service]
         Webhook[Telegram Webhook]
         Tasks[Task Management]
         XP[XP & Gamification Engine]
@@ -80,7 +84,7 @@ graph TD
     end
     
     %% Database
-    DB[(Neon PostgreSQL)]
+    DB[(Neon PostgreSQL Serverless)]
     
     %% Connections
     User <-->|/daily, /status| TelegramAPI
