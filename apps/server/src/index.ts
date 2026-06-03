@@ -1,0 +1,66 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import dotenv from 'dotenv';
+import { userRoutes } from './routes/users';
+import { taskRoutes } from './routes/tasks';
+import { gamificationRoutes } from './routes/gamification';
+import { whatsappRoutes } from './routes/whatsapp';
+import { adminRoutes } from './routes/admin';
+import { startCronJobs } from './jobs/cronScheduler';
+
+dotenv.config({ path: '../../.env' });
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// ── Middleware ────────────────────────────────────────────────
+app.use(helmet());
+app.use(compression());
+app.use(cors({
+  origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  credentials: true,
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// ── Health Check ─────────────────────────────────────────────
+app.get('/api/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    uptime: process.uptime(),
+  });
+});
+
+// ── Routes ───────────────────────────────────────────────────
+app.use('/api/users', userRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/gamification', gamificationRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/admin', adminRoutes);
+
+// ── Error Handler ────────────────────────────────────────────
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(`[ERROR] ${err.message}`, err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
+});
+
+// ── Start Server ─────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`
+  ╔══════════════════════════════════════════════╗
+  ║  🚀 HelpMan API Server                      ║
+  ║  Running on: http://localhost:${PORT}          ║
+  ║  Environment: ${process.env.NODE_ENV || 'development'}              ║
+  ╚══════════════════════════════════════════════╝
+  `);
+  startCronJobs();
+});
+
+export default app;

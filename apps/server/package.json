@@ -1,0 +1,37 @@
+{
+  "name": "@helpman/server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "helmet": "^8.1.0",
+    "compression": "^1.8.0",
+    "express-rate-limit": "^7.5.0",
+    "@google/generative-ai": "^0.24.0",
+    "@prisma/client": "^6.9.0",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "zod": "^3.25.0",
+    "dotenv": "^16.5.0",
+    "axios": "^1.9.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "tsx": "^4.19.0",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node-cron": "^3.0.11",
+    "@types/node": "^22.15.0"
+  }
+}
