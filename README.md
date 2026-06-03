@@ -79,7 +79,7 @@ graph TD
     
     %% External APIs
     subgraph External [External Services]
-        Groq[Groq AI (Llama 3)]
+        Groq["Groq AI (Llama 3)"]
         TelegramAPI[Telegram API]
         CF_LC[Codeforces & LeetCode]
     end
