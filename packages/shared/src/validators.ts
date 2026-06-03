@@ -44,8 +44,18 @@ export const problemSchema = z.object({
   }),
 });
 
+export const theoryTaskSchema = z.object({
+  title: z.string(),
+  topic: z.enum(['CS Fundamentals', 'System Design', 'OOP', 'Networking', 'OS', 'DBMS', 'Other']).catch('Other'),
+  description: z.string(),
+  url: z.string().url().optional(),
+  xpValue: z.number().default(20),
+  platform: z.literal('theory').default('theory'),
+});
+
 export const aiTaskResponseSchema = z.object({
   problems: z.array(problemSchema).min(1).max(5),
+  theoryTasks: z.array(theoryTaskSchema).min(0).max(3).optional(),
   studyTip: z.string().optional(),
   encouragement: z.string().optional(),
 });
@@ -62,5 +72,6 @@ export const preferencesSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type Problem = z.infer<typeof problemSchema>;
+export type TheoryTask = z.infer<typeof theoryTaskSchema>;
 export type AITaskResponse = z.infer<typeof aiTaskResponseSchema>;
 export type PreferencesInput = z.infer<typeof preferencesSchema>;

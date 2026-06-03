@@ -61,12 +61,13 @@ STUDENT PROFILE:
 - Difficulty Preference: ${profile.difficultyPref}
 
 RULES:
-1. Generate EXACTLY 3 practice problems
-2. Problem difficulty should be within rating range ${ratingRange}
-3. Include at least 1 problem from a weak topic if known
-4. Mix platforms (Codeforces and LeetCode)
-5. CRITICAL: DO NOT recommend any of these problems, as the user has already solved them: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
-6. Include a motivational study tip
+1. Generate EXACTLY 3 coding problems (Codeforces/LeetCode)
+2. Generate EXACTLY 2 theory/reading tasks covering CS Fundamentals, System Design, OOP, OS, or DBMS. Provide a short description and optionally a url to read more.
+3. Coding problem difficulty should be within rating range ${ratingRange}
+4. Include at least 1 coding problem from a weak topic if known
+5. Mix platforms (Codeforces and LeetCode)
+6. CRITICAL: DO NOT recommend any of these coding problems, as the user has already solved them: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
+7. Include a motivational study tip
 
 OUTPUT FORMAT (STRICT JSON ONLY — YOU MUST RETURN A VALID JSON OBJECT):
 {
@@ -78,6 +79,15 @@ OUTPUT FORMAT (STRICT JSON ONLY — YOU MUST RETURN A VALID JSON OBJECT):
       "topic": "Dynamic Programming",
       "xpValue": 50,
       "platform": "leetcode"
+    }
+  ],
+  "theoryTasks": [
+    {
+      "title": "What is Polymorphism?",
+      "topic": "OOP",
+      "description": "Understand compile-time vs run-time polymorphism with examples.",
+      "url": "https://en.wikipedia.org/wiki/Polymorphism_(computer_science)",
+      "xpValue": 20
     }
   ],
   "studyTip": "Focus on understanding the pattern before coding",
@@ -114,6 +124,22 @@ function getFallbackTasks(profile: UserProfile): AITaskResponse {
         xpValue: 25,
         platform: 'leetcode',
       },
+    ],
+    theoryTasks: [
+      {
+        title: 'CAP Theorem',
+        topic: 'System Design',
+        description: 'Learn about Consistency, Availability, and Partition Tolerance in distributed systems.',
+        xpValue: 20,
+        platform: 'theory',
+      },
+      {
+        title: 'Four Pillars of OOP',
+        topic: 'OOP',
+        description: 'Review Encapsulation, Abstraction, Inheritance, and Polymorphism.',
+        xpValue: 20,
+        platform: 'theory',
+      }
     ],
     studyTip: 'Practice consistently — even 30 minutes daily makes a huge difference!',
     encouragement: `Day ${profile.currentStreak} of your streak! You're building something amazing! 💪`,

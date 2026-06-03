@@ -200,11 +200,16 @@ async function handleDaily(user: any, chatId: number) {
     await updateStreak(user.id);
     await awardXp(user.id, XP_VALUES.DAILY_LOGIN, 'daily_login');
 
+    const allTasks = [
+      ...aiResponse.problems,
+      ...(aiResponse.theoryTasks || [])
+    ];
+
     task = await prisma.dailyTask.create({
       data: {
         userId: user.id,
         taskDate: new Date(),
-        problems: aiResponse.problems as any,
+        problems: allTasks as any,
         status: 'PENDING',
       },
     });
@@ -213,7 +218,7 @@ async function handleDaily(user: any, chatId: number) {
 
     const msg = formatDailyTaskMessage(
       updatedUser!.name,
-      aiResponse.problems,
+      allTasks,
       updatedUser!.currentStreak,
       updatedUser!.currentXp,
       updatedUser!.rank,
@@ -222,7 +227,7 @@ async function handleDaily(user: any, chatId: number) {
     );
 
     // Send with "Mark Done" buttons
-    const buttons = aiResponse.problems.map((p: any, i: number) => ([{
+    const buttons = allTasks.map((p: any, i: number) => ([{
       text: `✅ Done: ${p.title}`,
       callback_data: `done_${i + 1}`,
     }]));

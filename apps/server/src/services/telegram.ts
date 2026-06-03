@@ -121,7 +121,7 @@ export async function getTelegramBotInfo(): Promise<TelegramUser | null> {
  */
 export function formatDailyTaskMessage(
   name: string,
-  problems: Array<{ title: string; url: string; difficulty: number; topic: string; xpValue: number; platform: string }>,
+  problems: Array<{ title: string; url?: string; difficulty?: number; topic: string; xpValue: number; platform: string; description?: string }>,
   streak: number,
   xp: number,
   rank: string,
@@ -133,8 +133,13 @@ export function formatDailyTaskMessage(
   const divider = `─────────────────────\n`;
 
   const problemLines = problems.map((p, i) => {
-    const emoji = p.platform === 'leetcode' ? '🟡' : '🔵';
-    return `${emoji} <b>${i + 1}. ${escapeHtml(p.title)}</b>\n   📊 ${escapeHtml(p.topic)} | ⚡ ${p.xpValue} XP\n   🔗 <a href="${p.url}">Solve on ${p.platform}</a>`;
+    if (p.platform === 'theory') {
+      const urlText = p.url ? `\n   🔗 <a href="${p.url}">Read more</a>` : '';
+      return `📖 <b>${i + 1}. ${escapeHtml(p.title)}</b>\n   📚 ${escapeHtml(p.topic)} | ⚡ ${p.xpValue} XP\n   📝 <i>${escapeHtml(p.description || '')}</i>${urlText}`;
+    } else {
+      const emoji = p.platform === 'leetcode' ? '🟡' : '🔵';
+      return `${emoji} <b>${i + 1}. ${escapeHtml(p.title)}</b>\n   📊 ${escapeHtml(p.topic)} | ⚡ ${p.xpValue} XP\n   🔗 <a href="${p.url}">Solve on ${p.platform}</a>`;
+    }
   }).join('\n\n');
 
   const tip = studyTip ? `\n\n💡 <b>Tip:</b> ${escapeHtml(studyTip)}` : '';
