@@ -4,7 +4,7 @@ import { webhookLimiter } from '../middleware/rateLimiter';
 import { sendTelegramMessage, sendTelegramMessageWithButtons, formatDailyTaskMessage, setTelegramWebhook } from '../services/telegram';
 import { generateDailyTasks } from '../services/gemini';
 import { getCodeforcesUser, getCodeforcesSubmissions, analyzeWeakTopics } from '../services/codeforces';
-import { getLeetCodeUser } from '../services/leetcode';
+import { getLeetCodeUser, getLeetCodeSubmissions } from '../services/leetcode';
 import { awardXp, updateStreak, getXpToNextRank } from '../services/xp-engine';
 import { XP_VALUES, RANK_EMOJIS, type RankTier } from '@helpman/shared';
 
@@ -167,23 +167,31 @@ async function handleDaily(user: any, chatId: number) {
     let cfRating: number | undefined;
     let lcSolved: number | undefined;
     let weakTopics: string[] = [];
+    let recentSolved: string[] = [];
 
     if (user.codeforcesHandle) {
       const cfUser = await getCodeforcesUser(user.codeforcesHandle);
       if (cfUser) cfRating = cfUser.rating;
       const subs = await getCodeforcesSubmissions(user.codeforcesHandle);
       weakTopics = analyzeWeakTopics(subs);
+      // Add recently solved CF problems
+      const solvedCF = subs.filter(s => s.verdict === 'OK').map(s => s.problem.name);
+      recentSolved.push(...solvedCF);
     }
 
     if (user.leetcodeHandle) {
       const lcUser = await getLeetCodeUser(user.leetcodeHandle);
       if (lcUser) lcSolved = lcUser.totalSolved;
+      const lcSubs = await getLeetCodeSubmissions(user.leetcodeHandle);
+      const solvedLC = lcSubs.map(s => s.title);
+      recentSolved.push(...solvedLC);
     }
 
     const aiResponse = await generateDailyTasks({
       codeforcesRating: cfRating,
       leetcodeSolved: lcSolved,
       weakTopics,
+      recentSolved,
       currentStreak: user.currentStreak,
       rank: user.rank,
       difficultyPref: user.preferences?.difficultyPref || 'adaptive',

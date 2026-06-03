@@ -10,6 +10,7 @@ interface UserProfile {
   currentStreak: number;
   rank: string;
   difficultyPref: string;
+  recentSolved?: string[];
 }
 
 /**
@@ -69,7 +70,8 @@ RULES:
 2. Problem difficulty should be within rating range ${ratingRange}
 3. Include at least 1 problem from a weak topic if known
 4. Mix platforms (Codeforces and LeetCode)
-5. Include a motivational study tip
+5. CRITICAL: DO NOT recommend any of these problems, as the user has already solved them: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
+6. Include a motivational study tip
 
 OUTPUT FORMAT (STRICT JSON — no markdown, no explanation):
 {
