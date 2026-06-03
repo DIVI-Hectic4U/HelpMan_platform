@@ -17,7 +17,7 @@ export default function LinkTelegramPage() {
 
       // Generate deep link token
       const token = `${u.id}:${Date.now()}`;
-      const botName = "helpman_bot"; // User will replace with actual bot name
+      const botName = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "helpman_bot"; 
       setLinkUrl(`https://t.me/${botName}?start=${token}`);
     }
 
