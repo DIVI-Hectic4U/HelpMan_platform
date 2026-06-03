@@ -2,7 +2,7 @@ import { Router } from 'express';
 import prisma from '../lib/prisma';
 import { requireAuth, type AuthRequest } from '../middleware/auth';
 import { geminiLimiter } from '../middleware/rateLimiter';
-import { generateDailyTasks } from '../services/gemini';
+import { generateDailyTasks } from '../services/ai';
 import { getCodeforcesUser, getCodeforcesSubmissions, analyzeWeakTopics } from '../services/codeforces';
 import { getLeetCodeUser } from '../services/leetcode';
 import { awardXp, updateStreak } from '../services/xp-engine';
