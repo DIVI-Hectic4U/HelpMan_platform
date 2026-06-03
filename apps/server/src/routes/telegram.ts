@@ -230,10 +230,27 @@ async function handleDaily(user: any, chatId: number) {
     await sendTelegramMessageWithButtons(chatId, msg, buttons);
   } else {
     const problems = task.problems as any[];
+    
+    // Create buttons ONLY for uncompleted problems
+    const buttons = problems
+      .map((p: any, i: number) => {
+        if (p.completed) return null;
+        return [{
+          text: `✅ Done: ${p.title}`,
+          callback_data: `done_${i + 1}`,
+        }];
+      })
+      .filter(Boolean); // Remove nulls
+
     const msg = formatDailyTaskMessage(
       user.name, problems, user.currentStreak, user.currentXp, user.rank,
     );
-    await sendTelegramMessage({ chatId, text: '📌 You already have today\'s tasks:\n\n' + msg });
+    
+    if (buttons.length > 0) {
+      await sendTelegramMessageWithButtons(chatId, '📌 You have pending tasks for today:\n\n' + msg, buttons);
+    } else {
+      await sendTelegramMessage({ chatId, text: '🎉 You have completed all tasks for today!\n\n' + msg });
+    }
   }
 }
 
@@ -280,11 +297,28 @@ async function handleDone(user: any, chatId: number, args: string[]) {
   }
 
   const problem = problems[problemNum - 1];
+  
+  if (problem.completed) {
+    await sendTelegramMessage({ chatId, text: `⚠️ You have already completed Problem #${problemNum} (${problem.title})!` });
+    return;
+  }
+
+  // Mark this specific problem as completed
+  problem.completed = true;
+  
+  // Check if all problems for today are now completed
+  const allCompleted = problems.every((p: any) => p.completed === true);
+
   const xpResult = await awardXp(user.id, problem.xpValue || XP_VALUES.MEDIUM_SOLVE, 'daily_solve');
 
   await prisma.dailyTask.update({
     where: { id: task.id },
-    data: { status: 'COMPLETED', xpAwarded: xpResult.xpAwarded, completedAt: new Date() },
+    data: { 
+      problems: problems,
+      status: allCompleted ? 'COMPLETED' : 'PENDING', 
+      xpAwarded: task.xpAwarded + xpResult.xpAwarded, 
+      completedAt: allCompleted ? new Date() : null 
+    },
   });
 
   let msg = `✅ <b>Problem Completed!</b>\n\n` +
