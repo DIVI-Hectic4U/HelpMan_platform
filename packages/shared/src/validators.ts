@@ -28,10 +28,20 @@ export const whatsappNumberSchema = z.string()
 export const problemSchema = z.object({
   title: z.string(),
   url: z.string().url(),
-  difficulty: z.number().int().min(0).max(4000),
+  difficulty: z.union([z.number(), z.string()]).transform(val => {
+    if (typeof val === 'number') return val;
+    const num = parseInt(val.replace(/[^0-9]/g, ''));
+    return isNaN(num) ? 1000 : num;
+  }),
   topic: z.string(),
-  xpValue: z.number().int().min(0).max(500),
-  platform: z.enum(['codeforces', 'leetcode']),
+  xpValue: z.union([z.number(), z.string()]).transform(val => {
+    if (typeof val === 'number') return val;
+    const num = parseInt(val.replace(/[^0-9]/g, ''));
+    return isNaN(num) ? 50 : num;
+  }),
+  platform: z.string().transform(val => {
+    return val.toLowerCase().includes('codeforces') ? 'codeforces' : 'leetcode';
+  }),
 });
 
 export const aiTaskResponseSchema = z.object({
