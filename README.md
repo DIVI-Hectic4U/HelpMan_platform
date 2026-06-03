@@ -7,7 +7,7 @@
 [![Built with Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-316192?style=for-the-badge&logo=postgresql)](https://neon.tech)
-[![Gemini AI](https://img.shields.io/badge/Gemini-AI-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev)
+[![Groq AI](https://img.shields.io/badge/Groq-Llama%203-f55036?style=for-the-badge&logo=ai)](https://groq.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 </div>
@@ -24,7 +24,7 @@
 - No motivation system to maintain consistency during stressful seasons
 
 ### The Solution
-- **AI Engine**: Gemini AI analyzes your ratings, weak topics, and history to generate 3 targeted problems daily
+- **AI Engine**: Groq (Llama 3.3) analyzes your ratings, weak topics, and history to generate 3 targeted coding problems and 2 theory reading tasks daily.
 - **Telegram Delivery**: Receive tasks right where you chat using our Telegram Bot
 - **Gamification**: XP with log-capped streak multipliers, rank progression (Bronze → Master), and competitive leaderboards
 
@@ -34,7 +34,8 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🤖 **AI Task Engine** | Gemini AI generates personalized daily problems from CF/LC |
+| 🤖 **AI Task Engine** | Groq (Llama 3) generates personalized daily coding and theory tasks |
+| 📖 **Theory Tasks** | Integrates CS Fundamentals and System Design into your daily prep |
 | 📱 **Telegram Bot** | Quick daily delivery of tasks using `/daily` via Telegram |
 | 🔥 **Streak System** | Log-capped multipliers reward consistency fairly |
 | 🏆 **Rank Progression** | Progress from Bronze → Silver → Gold → Platinum → Master |
@@ -78,7 +79,7 @@ graph TD
     
     %% External APIs
     subgraph External [External Services]
-        Gemini[Google Gemini AI]
+        Groq[Groq AI (Llama 3)]
         TelegramAPI[Telegram API]
         CF_LC[Codeforces & LeetCode]
     end
@@ -92,7 +93,7 @@ graph TD
     Web <-->|REST API| Backend
     
     Webhook --> Tasks
-    Tasks --> Gemini
+    Tasks --> Groq
     Tasks --> CF_LC
     Tasks --> XP
     
@@ -102,8 +103,8 @@ graph TD
 ### How the Magic Works (The `/daily` Command)
 1. **Trigger**: You send `/daily` to the Telegram Bot.
 2. **Data Gathering**: The Express backend instantly fetches your live Codeforces and LeetCode ratings.
-3. **AI Generation**: A structured prompt containing your ratings and weak topics is sent to **Google Gemini AI**.
-4. **Processing**: Gemini returns 3 perfectly tailored coding problems. The backend validates this and securely stores it in **PostgreSQL**.
+3. **AI Generation**: A structured prompt containing your ratings and weak topics is sent to the incredibly fast **Groq API** (running **Meta's Llama 3.3**).
+4. **Processing**: Groq returns 3 perfectly tailored coding problems and 2 CS theory reading tasks. The backend validates this and securely stores it in **PostgreSQL**.
 5. **Delivery**: The server formats the tasks into a rich message and delivers it back to you on Telegram.
 
 ---
