@@ -2,7 +2,7 @@ import { Router } from 'express';
 import prisma from '../lib/prisma';
 import { webhookLimiter } from '../middleware/rateLimiter';
 import { sendTelegramMessage, sendTelegramMessageWithButtons, formatDailyTaskMessage, setTelegramWebhook } from '../services/telegram';
-import { generateDailyTasks } from '../services/gemini';
+import { generateDailyTasks } from '../services/ai';
 import { getCodeforcesUser, getCodeforcesSubmissions, analyzeWeakTopics } from '../services/codeforces';
 import { getLeetCodeUser, getLeetCodeSubmissions } from '../services/leetcode';
 import { awardXp, updateStreak, getXpToNextRank } from '../services/xp-engine';
