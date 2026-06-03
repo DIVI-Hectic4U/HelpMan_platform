@@ -245,7 +245,7 @@ async function handleDaily(user: any, chatId: number) {
           callback_data: `done_${i + 1}`,
         }];
       })
-      .filter(Boolean); // Remove nulls
+      .filter((b): b is { text: string; callback_data: string; }[] => b !== null);
 
     const msg = formatDailyTaskMessage(
       user.name, problems, user.currentStreak, user.currentXp, user.rank,
