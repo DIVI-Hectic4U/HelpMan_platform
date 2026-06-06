@@ -239,14 +239,15 @@ export async function getProblemCandidates(minRating: number, maxRating: number,
   const cfBank = await getCfProblemBank();
   const lcBank = await getLcProblemBank();
 
+  // Codeforces: Strictly within the requested rating range
   const validCf = cfBank.filter(p => p.rating && p.rating >= minRating && p.rating <= maxRating && p.contestId > 1000);
   
-  const lcDifficulty = minRating <= 1000 ? 'Easy' : minRating <= 1400 ? 'Medium' : 'Hard';
-  const validLc = lcBank.filter(p => p.difficulty === lcDifficulty);
+  // LeetCode: Completely random, ignoring difficulty constraints
+  const validLc = lcBank;
 
-  // Pick random subset
-  const shuffledCf = [...validCf].sort(() => Math.random() - 0.5).slice(0, Math.floor(count / 2));
-  const shuffledLc = [...validLc].sort(() => Math.random() - 0.5).slice(0, Math.ceil(count / 2));
+  // Pick random subset (Provide more LC than CF to help AI pick 2 LC and 1 CF)
+  const shuffledCf = [...validCf].sort(() => Math.random() - 0.5).slice(0, Math.floor(count / 3)); // 6-7 CF problems
+  const shuffledLc = [...validLc].sort(() => Math.random() - 0.5).slice(0, count - Math.floor(count / 3)); // 13-14 LC problems
 
   let poolText = '';
   

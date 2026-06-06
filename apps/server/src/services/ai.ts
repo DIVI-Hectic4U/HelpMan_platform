@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import { aiTaskResponseSchema, type AITaskResponse } from '@helpman/shared';
-import { validateAndFixProblems } from './url-validator';
+import { validateAndFixProblems, getProblemCandidates } from './url-validator';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
@@ -20,7 +20,13 @@ interface UserProfile {
  * All URLs are verified against real APIs before returning.
  */
 export async function generateDailyTasks(profile: UserProfile): Promise<AITaskResponse> {
-  const prompt = buildPrompt(profile);
+  // Use Codeforces rating -100 to +200
+  const minRating = profile.codeforcesRating ? profile.codeforcesRating - 100 : 800;
+  const maxRating = profile.codeforcesRating ? profile.codeforcesRating + 200 : 1200;
+  
+  // Fetch a pool of real problems from the APIs so the AI doesn't hallucinate
+  const candidatePool = await getProblemCandidates(minRating, maxRating, 20);
+  const prompt = buildPrompt(profile, candidatePool);
 
   try {
     const chatCompletion = await groq.chat.completions.create({
@@ -93,24 +99,25 @@ const ALL_THEORY_TOPICS = [
   'Virtual Memory', 'Paging', 'Threads vs Processes', 'Mutex vs Semaphore',
 ];
 
-function buildPrompt(profile: UserProfile): string {
+function buildPrompt(profile: UserProfile, candidatePool: string): string {
   const ratingRange = profile.codeforcesRating
-    ? `[${profile.codeforcesRating - 200}, ${profile.codeforcesRating + 100}]`
+    ? `[${profile.codeforcesRating - 100}, ${profile.codeforcesRating + 200}]`
     : '[800, 1200]';
 
   // Inject randomness: pick a subset of topics to focus on today
-  const todaysCodingTopics = pickRandom(ALL_CODING_TOPICS, 6);
   const todaysTheoryTopics = pickRandom(ALL_THEORY_TOPICS, 4);
   const seed = getDailyRandomSeed();
 
   return `You are an expert competitive programming coach. Generate a UNIQUE daily practice plan.
 
 SESSION SEED: ${seed}
-(This seed ensures you generate COMPLETELY DIFFERENT problems from any previous session. Treat this as a hard constraint.)
+(This seed ensures you generate COMPLETELY DIFFERENT reading tasks from any previous session.)
 
-TODAY'S FOCUS TOPICS (pick problems from THESE topics):
-- Coding: ${todaysCodingTopics.join(', ')}
-- Theory: ${todaysTheoryTopics.join(', ')}
+TODAY'S THEORY FOCUS TOPICS:
+- ${todaysTheoryTopics.join(', ')}
+
+AVAILABLE CODING PROBLEMS POOL:
+${candidatePool}
 
 STUDENT PROFILE:
 - Codeforces Rating: ${profile.codeforcesRating || 'Unrated'}
@@ -121,15 +128,12 @@ STUDENT PROFILE:
 - Difficulty Preference: ${profile.difficultyPref}
 
 RULES:
-1. Generate EXACTLY 3 coding problems (Codeforces/LeetCode)
-2. Generate EXACTLY 2 theory/reading tasks from today's theory focus topics. Provide a short description and optionally a url to read more.
-3. Coding problem difficulty should be within rating range ${ratingRange}
-4. Include at least 1 coding problem from a weak topic if known
-5. Mix platforms (Codeforces and LeetCode)
-6. CRITICAL: DO NOT recommend any of these problems: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
-7. CRITICAL: DO NOT pick well-known classic problems (e.g. Two Sum, Watermelon, Valid Parentheses, Game 23, The Sports Festival). Pick LESSER-KNOWN, DIVERSE problems that most students haven't seen.
-8. For Codeforces, pick problems from contest numbers above 1000 to ensure variety.
-9. Include a motivational study tip
+1. Generate EXACTLY 3 coding problems. YOU MUST SELECT EXACTLY 2 LEETCODE PROBLEMS AND EXACTLY 1 CODEFORCES PROBLEM.
+2. YOU MUST CHOOSE THESE 3 PROBLEMS EXACTLY FROM THE "AVAILABLE CODING PROBLEMS POOL" ABOVE. Do NOT invent problems. Do NOT guess URLs. Copy the Title, URL, and Difficulty exactly as provided in the pool.
+3. Generate EXACTLY 2 theory/reading tasks from today's theory focus topics. Provide a short description and optionally a url to read more.
+4. Try to select coding problems from the pool that match the student's weak topics if possible.
+5. CRITICAL: DO NOT recommend any problems the student has already solved: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
+6. Include a motivational study tip
 
 OUTPUT FORMAT (STRICT JSON ONLY — YOU MUST RETURN A VALID JSON OBJECT):
 {
