@@ -99,7 +99,7 @@ export async function getLcProblemBank(): Promise<LcProblem[]> {
   }
 
   try {
-    const res = await axios.get('https://leetcode.com/api/problems/all/', {
+    const res = await axios.get('https://leetcode.com/api/problems/algorithms/', {
       timeout: 15000,
       headers: { 'Accept': 'application/json' },
     });
@@ -242,8 +242,10 @@ export async function getProblemCandidates(minRating: number, maxRating: number,
   // Codeforces: Strictly within the requested rating range
   const validCf = cfBank.filter(p => p.rating && p.rating >= minRating && p.rating <= maxRating && p.contestId > 1000);
   
-  // LeetCode: Completely random, ignoring difficulty constraints
-  const validLc = lcBank;
+  // LeetCode: Completely random, ignoring difficulty constraints.
+  // Only allow "Design" (System Design / Object Design) questions roughly 2 days a week (2/7 chance).
+  const allowSystemDesign = Math.random() < (2 / 7);
+  const validLc = lcBank.filter(p => allowSystemDesign || !p.title.toLowerCase().includes('design'));
 
   // Pick random subset (Provide more LC than CF to help AI pick 2 LC and 1 CF)
   const shuffledCf = [...validCf].sort(() => Math.random() - 0.5).slice(0, Math.floor(count / 3)); // 6-7 CF problems
