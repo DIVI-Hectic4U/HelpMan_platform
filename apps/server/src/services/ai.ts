@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk';
 import { aiTaskResponseSchema, type AITaskResponse } from '@helpman/shared';
+import { validateAndFixProblems } from './url-validator';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
@@ -16,6 +17,7 @@ interface UserProfile {
 /**
  * Generate personalized daily coding tasks using Groq AI (Llama 3).
  * Returns validated, structured problem recommendations.
+ * All URLs are verified against real APIs before returning.
  */
 export async function generateDailyTasks(profile: UserProfile): Promise<AITaskResponse> {
   const prompt = buildPrompt(profile);
@@ -39,6 +41,12 @@ export async function generateDailyTasks(profile: UserProfile): Promise<AITaskRe
 
     // Validate with our forgiving Zod schema
     const validated = aiTaskResponseSchema.parse(parsed);
+
+    // Verify all problem URLs are real (not hallucinated 404s)
+    // Replace any broken links with verified problems from the CF/LC APIs
+    console.log('[AI] Validating problem URLs...');
+    validated.problems = await validateAndFixProblems(validated.problems as any) as any;
+
     return validated;
 
   } catch (error) {
