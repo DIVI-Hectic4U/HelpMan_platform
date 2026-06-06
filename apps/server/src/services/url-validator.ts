@@ -1,32 +1,6 @@
 import axios from 'axios';
 
-/**
- * Validates that a problem URL actually exists (not a 404).
- * Uses a lightweight HEAD request with a short timeout.
- */
-async function isUrlAlive(url: string): Promise<boolean> {
-  try {
-    const res = await axios.head(url, {
-      timeout: 5000,
-      maxRedirects: 3,
-      validateStatus: (status) => status < 400, // 2xx and 3xx are OK
-    });
-    return true;
-  } catch {
-    // HEAD might be blocked by some sites, try GET with minimal data
-    try {
-      const res = await axios.get(url, {
-        timeout: 5000,
-        maxRedirects: 3,
-        validateStatus: (status) => status < 400,
-        headers: { 'Range': 'bytes=0-0' }, // Request minimal data
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
+
 
 // ── Codeforces Problem Bank (fetched from real API) ──────────────
 
@@ -45,7 +19,7 @@ let cfCacheExpiry = 0;
  * Fetches the full Codeforces problem set from the API.
  * Cached for 24 hours to avoid hammering the API.
  */
-async function getCfProblemBank(): Promise<CfProblem[]> {
+export async function getCfProblemBank(): Promise<CfProblem[]> {
   if (cfProblemCache.length > 0 && Date.now() < cfCacheExpiry) {
     return cfProblemCache;
   }
@@ -119,7 +93,7 @@ let lcCacheExpiry = 0;
  * Fetches LeetCode problems from their public API.
  * Cached for 24 hours.
  */
-async function getLcProblemBank(): Promise<LcProblem[]> {
+export async function getLcProblemBank(): Promise<LcProblem[]> {
   if (lcProblemCache.length > 0 && Date.now() < lcCacheExpiry) {
     return lcProblemCache;
   }
@@ -194,10 +168,30 @@ export async function validateAndFixProblems(problems: AiProblem[]): Promise<AiP
   const validatedProblems: AiProblem[] = [];
   const usedTitles: string[] = [];
 
-  for (const problem of problems) {
-    const alive = await isUrlAlive(problem.url);
+  // Ensure banks are loaded
+  const cfBank = await getCfProblemBank();
+  const lcBank = await getLcProblemBank();
 
-    if (alive) {
+  for (const problem of problems) {
+    let isValid = false;
+
+    // Fast local verification against the cached API banks
+    if (problem.platform === 'codeforces') {
+      const match = problem.url.match(/\/problemset\/problem\/(\d+)\/([^/]+)/);
+      if (match) {
+        const contestId = parseInt(match[1]);
+        const index = match[2];
+        isValid = cfBank.some(p => p.contestId === contestId && p.index === index);
+      }
+    } else {
+      const match = problem.url.match(/\/problems\/([^/]+)/);
+      if (match) {
+        const titleSlug = match[1];
+        isValid = lcBank.some(p => p.titleSlug === titleSlug);
+      }
+    }
+
+    if (isValid) {
       console.log(`[URL Validator] ✅ ${problem.title} — URL is valid`);
       validatedProblems.push(problem);
       usedTitles.push(problem.title);
@@ -235,4 +229,35 @@ export async function validateAndFixProblems(problems: AiProblem[]): Promise<AiP
   }
 
   return validatedProblems;
+}
+
+/**
+ * Fetches a mixed pool of real CF and LC problems within the user's difficulty range.
+ * The AI will use this pool to select exactly 3 problems, guaranteeing no hallucinations.
+ */
+export async function getProblemCandidates(minRating: number, maxRating: number, count: number = 20): Promise<string> {
+  const cfBank = await getCfProblemBank();
+  const lcBank = await getLcProblemBank();
+
+  const validCf = cfBank.filter(p => p.rating && p.rating >= minRating && p.rating <= maxRating && p.contestId > 1000);
+  
+  const lcDifficulty = minRating <= 1000 ? 'Easy' : minRating <= 1400 ? 'Medium' : 'Hard';
+  const validLc = lcBank.filter(p => p.difficulty === lcDifficulty);
+
+  // Pick random subset
+  const shuffledCf = [...validCf].sort(() => Math.random() - 0.5).slice(0, Math.floor(count / 2));
+  const shuffledLc = [...validLc].sort(() => Math.random() - 0.5).slice(0, Math.ceil(count / 2));
+
+  let poolText = '';
+  
+  shuffledCf.forEach(p => {
+    poolText += `- [Codeforces] Title: "${p.name}", URL: https://codeforces.com/problemset/problem/${p.contestId}/${p.index}, Difficulty: ${p.rating}, Topics: ${p.tags.slice(0, 3).join(', ')}\n`;
+  });
+
+  shuffledLc.forEach(p => {
+    const diffNum = p.difficulty === 'Easy' ? 800 : p.difficulty === 'Medium' ? 1200 : 1600;
+    poolText += `- [LeetCode] Title: "${p.title}", URL: https://leetcode.com/problems/${p.titleSlug}/, Difficulty: ${diffNum}\n`;
+  });
+
+  return poolText;
 }
