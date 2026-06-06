@@ -22,9 +22,13 @@ export async function generateDailyTasks(profile: UserProfile): Promise<AITaskRe
 
   try {
     const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'llama-3.3-70b-versatile', // Fast and highly capable model
-      temperature: 0.5,
+      messages: [
+        { role: 'system', content: 'You are a competitive programming coach who knows thousands of obscure problems across Codeforces and LeetCode. You NEVER repeat recommendations. Every response must contain completely different problems.' },
+        { role: 'user', content: prompt }
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.9,       // High creativity for maximum diversity
+      top_p: 0.95,            // Broader token sampling pool
       response_format: { type: 'json_object' }
     });
 
@@ -45,12 +49,60 @@ export async function generateDailyTasks(profile: UserProfile): Promise<AITaskRe
   }
 }
 
+/**
+ * Generates a unique daily random seed to force the LLM to produce
+ * different outputs even when the rest of the prompt is similar.
+ */
+function getDailyRandomSeed(): string {
+  const today = new Date().toISOString().slice(0, 10); // e.g. "2026-06-06"
+  const randomHex = Math.random().toString(36).substring(2, 10); // e.g. "k7f2x9ab"
+  return `${today}-${randomHex}`;
+}
+
+/** Pick N random items from a larger pool to vary the topic focus each day */
+function pickRandom<T>(arr: T[], n: number): T[] {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
+
+const ALL_CODING_TOPICS = [
+  'Binary Search', 'Two Pointers', 'Sliding Window', 'Stack', 'Queue',
+  'Heap', 'Hashing', 'Linked List', 'Trees', 'Graphs', 'BFS', 'DFS',
+  'Dynamic Programming', 'Greedy', 'Backtracking', 'Divide and Conquer',
+  'Bit Manipulation', 'Math', 'Number Theory', 'Combinatorics',
+  'String Algorithms', 'Trie', 'Union Find', 'Segment Tree',
+  'Shortest Path', 'Topological Sort', 'Game Theory', 'Geometry',
+  'Sorting', 'Simulation', 'Constructive Algorithms', 'Implementation',
+];
+
+const ALL_THEORY_TOPICS = [
+  'System Design', 'OOP Principles', 'SOLID Principles', 'Design Patterns',
+  'Database Normalization', 'SQL vs NoSQL', 'ACID Properties', 'CAP Theorem',
+  'Operating Systems', 'Process Scheduling', 'Memory Management', 'Deadlocks',
+  'Networking', 'TCP vs UDP', 'HTTP/HTTPS', 'DNS', 'Load Balancing',
+  'Caching Strategies', 'Microservices', 'API Design', 'REST vs GraphQL',
+  'Message Queues', 'Distributed Systems', 'Consistent Hashing',
+  'Virtual Memory', 'Paging', 'Threads vs Processes', 'Mutex vs Semaphore',
+];
+
 function buildPrompt(profile: UserProfile): string {
   const ratingRange = profile.codeforcesRating
     ? `[${profile.codeforcesRating - 200}, ${profile.codeforcesRating + 100}]`
     : '[800, 1200]';
 
-  return `You are an expert competitive programming coach. Generate a personalized daily practice plan.
+  // Inject randomness: pick a subset of topics to focus on today
+  const todaysCodingTopics = pickRandom(ALL_CODING_TOPICS, 6);
+  const todaysTheoryTopics = pickRandom(ALL_THEORY_TOPICS, 4);
+  const seed = getDailyRandomSeed();
+
+  return `You are an expert competitive programming coach. Generate a UNIQUE daily practice plan.
+
+SESSION SEED: ${seed}
+(This seed ensures you generate COMPLETELY DIFFERENT problems from any previous session. Treat this as a hard constraint.)
+
+TODAY'S FOCUS TOPICS (pick problems from THESE topics):
+- Coding: ${todaysCodingTopics.join(', ')}
+- Theory: ${todaysTheoryTopics.join(', ')}
 
 STUDENT PROFILE:
 - Codeforces Rating: ${profile.codeforcesRating || 'Unrated'}
@@ -62,12 +114,14 @@ STUDENT PROFILE:
 
 RULES:
 1. Generate EXACTLY 3 coding problems (Codeforces/LeetCode)
-2. Generate EXACTLY 2 theory/reading tasks covering CS Fundamentals, System Design, OOP, OS, or DBMS. Provide a short description and optionally a url to read more.
+2. Generate EXACTLY 2 theory/reading tasks from today's theory focus topics. Provide a short description and optionally a url to read more.
 3. Coding problem difficulty should be within rating range ${ratingRange}
 4. Include at least 1 coding problem from a weak topic if known
 5. Mix platforms (Codeforces and LeetCode)
-6. CRITICAL: DO NOT recommend any of these coding problems, as the user has already solved them: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
-7. Include a motivational study tip
+6. CRITICAL: DO NOT recommend any of these problems: ${profile.recentSolved?.length ? profile.recentSolved.join(', ') : 'None specified'}
+7. CRITICAL: DO NOT pick well-known classic problems (e.g. Two Sum, Watermelon, Valid Parentheses, Game 23, The Sports Festival). Pick LESSER-KNOWN, DIVERSE problems that most students haven't seen.
+8. For Codeforces, pick problems from contest numbers above 1000 to ensure variety.
+9. Include a motivational study tip
 
 OUTPUT FORMAT (STRICT JSON ONLY — YOU MUST RETURN A VALID JSON OBJECT):
 {
