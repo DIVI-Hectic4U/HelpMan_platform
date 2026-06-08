@@ -223,7 +223,7 @@ export default function DashboardPage() {
             <p style={{ fontSize: "2rem", marginBottom: "var(--space-3)" }}>🤖</p>
             <p>No tasks generated yet today.</p>
             <p style={{ fontSize: "0.85rem", marginTop: "var(--space-2)" }}>
-              Click &quot;Generate Tasks&quot; or send <code style={{ color: "var(--accent-light)" }}>!daily</code> on WhatsApp
+              Click &quot;Generate Tasks&quot; or send <code style={{ color: "var(--accent-light)" }}>/daily</code> on Telegram
             </p>
           </div>
         )}
@@ -248,11 +248,11 @@ export default function DashboardPage() {
         </div>
 
         <div className="glass-card" style={{ padding: "var(--space-5)", textAlign: "center" }}>
-          <span style={{ fontSize: "1.5rem" }}>📱</span>
+          <span style={{ fontSize: "1.5rem" }}>🤖</span>
           <h3 style={{ fontSize: "0.9rem", margin: "var(--space-2) 0" }}>
-            {user?.whatsappLinked ? "Connected ✅" : "Not Linked"}
+            {user?.telegramLinked ? "Connected ✅" : "Not Linked"}
           </h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>WhatsApp</p>
+          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Telegram</p>
         </div>
       </div>
     </div>

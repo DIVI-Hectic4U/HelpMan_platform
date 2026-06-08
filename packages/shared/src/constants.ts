@@ -55,17 +55,15 @@ export const RANK_EMOJIS: Record<RankTier, string> = {
   MASTER: '👑',
 };
 
-// ── WhatsApp Commands ────────────────────────────────────────
-export const WHATSAPP_COMMANDS = {
-  DAILY: '!daily',
-  STATUS: '!status',
-  DONE: '!done',
-  HARDER: '!harder',
-  EASIER: '!easier',
-  LEADERBOARD: '!leaderboard',
-  HELP: '!help',
-  PROFILE: '!profile',
-  RESET: '!reset',
+// ── Telegram Bot Commands ────────────────────────────────────
+export const TELEGRAM_COMMANDS = {
+  DAILY: '/daily',
+  STATUS: '/status',
+  DONE: '/done',
+  LEADERBOARD: '/leaderboard',
+  HELP: '/help',
+  PROFILE: '/profile',
+  START: '/start',
 } as const;
 
 // ── API Rate Limits ──────────────────────────────────────────

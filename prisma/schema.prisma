@@ -37,8 +37,8 @@ model User {
   name             String
   passwordHash     String?
   authProvider     String    @default("credentials")
-  whatsappNumber   String?   @unique
-  whatsappLinked   Boolean   @default(false)
+  telegramChatId   String?   @unique
+  telegramLinked   Boolean   @default(false)
   leetcodeHandle   String?
   codeforcesHandle String?
   currentXp        Int       @default(0)
@@ -103,12 +103,13 @@ model ProfileCache {
 }
 
 model UserPreference {
-  userId          String  @id
-  timezone        String  @default("Asia/Kolkata")
-  difficultyPref  String  @default("adaptive") // 'easy', 'medium', 'hard', 'adaptive'
-  dailyReminderAt String  @default("08:00")
-  notificationsOn Boolean @default(true)
-  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String  @id
+  timezone         String  @default("Asia/Kolkata")
+  difficultyPref   String  @default("adaptive") // 'easy', 'medium', 'hard', 'adaptive'
+  dailyReminderAt  String  @default("08:00")
+  notificationsOn  Boolean @default(true)
+  pushSubscription String? // JSON string for Web Push subscription
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ProblemBank {

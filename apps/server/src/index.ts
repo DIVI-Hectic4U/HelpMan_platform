@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 import { userRoutes } from './routes/users';
 import { taskRoutes } from './routes/tasks';
 import { gamificationRoutes } from './routes/gamification';
-import { whatsappRoutes } from './routes/whatsapp';
+import { telegramRoutes } from './routes/telegram';
+import { pushRoutes } from './routes/push';
 import { adminRoutes } from './routes/admin';
 import { startCronJobs } from './jobs/cronScheduler';
 
@@ -39,7 +40,8 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/gamification', gamificationRoutes);
-app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/telegram', telegramRoutes);
+app.use('/api/push', pushRoutes);
 app.use('/api/admin', adminRoutes);
 
 // ── Error Handler ────────────────────────────────────────────

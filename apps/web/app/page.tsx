@@ -55,7 +55,7 @@ export default function LandingPage() {
             <br />With AI & Gamification
           </h1>
           <p className={`${styles.heroSubtitle} animate-fade-in-up stagger-2`}>
-            Daily AI-curated coding problems delivered straight to your WhatsApp.
+            Daily AI-curated coding problems delivered straight to your Telegram.
             Track progress with XP, streaks, and compete on leaderboards.
             Built for placement season warriors.
           </p>
@@ -140,7 +140,7 @@ export default function LandingPage() {
         <div className={styles.featureGrid}>
           {[
             { icon: "🤖", title: "AI Task Engine", desc: "Gemini AI analyzes your Codeforces & LeetCode profiles to generate perfectly-tuned daily problems." },
-            { icon: "📱", title: "WhatsApp Integration", desc: "Get daily tasks right in WhatsApp. Just send !daily — no app download needed." },
+            { icon: "🤖", title: "Telegram Bot", desc: "Get daily tasks right in Telegram. Just send /daily — instant setup, no verification needed." },
             { icon: "🔥", title: "Streak System", desc: "Build momentum with daily streaks. Log-capped multipliers reward consistency without being unfair." },
             { icon: "🏆", title: "Rank Progression", desc: "Climb from Bronze to Master. Real-time rank-ups with celebratory notifications." },
             { icon: "📊", title: "Smart Analytics", desc: "Track your weak topics, solve rate, XP history, and competitive standings." },
@@ -164,7 +164,7 @@ export default function LandingPage() {
 
         <div className={styles.steps}>
           {[
-            { num: "01", title: "Link Your Profiles", desc: "Connect your Codeforces and LeetCode handles. Link your WhatsApp for daily deliveries." },
+            { num: "01", title: "Link Your Profiles", desc: "Connect your Codeforces and LeetCode handles. Link your Telegram for daily deliveries." },
             { num: "02", title: "Get AI-Curated Tasks", desc: "Our AI analyzes your rating, weak topics, and history to generate 3 targeted problems daily." },
             { num: "03", title: "Solve, Earn XP, Rank Up", desc: "Complete problems to earn XP with streak multipliers. Climb the leaderboard and unlock ranks." },
           ].map((step, i) => (
