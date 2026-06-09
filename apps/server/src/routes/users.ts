@@ -89,7 +89,7 @@ userRoutes.get('/me', requireAuth, async (req: AuthRequest, res) => {
       select: {
         id: true, name: true, email: true, rank: true,
         currentXp: true, currentStreak: true, longestStreak: true,
-        whatsappLinked: true, leetcodeHandle: true, codeforcesHandle: true,
+        telegramLinked: true, leetcodeHandle: true, codeforcesHandle: true,
         role: true, avatarUrl: true, createdAt: true,
         preferences: true,
       },

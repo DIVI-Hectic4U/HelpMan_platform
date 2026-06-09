@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "HelpMan — AI-Powered Placement Prep Platform",
   description: "Gamified AI placement preparation platform with daily coding tasks via WhatsApp. Track your progress with XP, streaks, and leaderboards.",
   keywords: ["placement preparation", "competitive programming", "AI", "LeetCode", "Codeforces", "gamification"],
-  authors: [{ name: "Divyanshu Singh" }],
+  authors: [{ name: "Divyanshu" }],
   openGraph: {
     title: "HelpMan — AI-Powered Placement Prep Platform",
     description: "Daily AI-curated coding problems delivered via WhatsApp. Level up with XP, streaks, and ranks.",

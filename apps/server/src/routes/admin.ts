@@ -68,7 +68,7 @@ adminRoutes.get('/users', async (req, res) => {
       take: limit,
       select: {
         id: true, name: true, email: true, rank: true,
-        currentXp: true, currentStreak: true, whatsappLinked: true,
+        currentXp: true, currentStreak: true, telegramLinked: true,
         role: true, createdAt: true, lastActiveDate: true,
         leetcodeHandle: true, codeforcesHandle: true,
       },

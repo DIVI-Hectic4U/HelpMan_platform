@@ -241,7 +241,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>© 2026 HelpMan. Built by Divyanshu Singh.</p>
+          <p>© 2026 HelpMan. All rights reserved.</p>
         </div>
       </footer>
     </div>

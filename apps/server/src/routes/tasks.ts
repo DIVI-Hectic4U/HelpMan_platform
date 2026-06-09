@@ -131,11 +131,11 @@ taskRoutes.post('/generate', requireAuth, geminiLimiter, async (req: AuthRequest
 // ── Mark Problem as Done ─────────────────────────────────────
 taskRoutes.post('/complete/:taskId/:problemIndex', requireAuth, async (req: AuthRequest, res) => {
   try {
-    const { taskId, problemIndex } = req.params;
-    const idx = parseInt(problemIndex);
+    const taskId = req.params.taskId as string;
+    const idx = parseInt(req.params.problemIndex as string);
 
     const task = await prisma.dailyTask.findFirst({
-      where: { id: taskId, userId: req.userId! },
+      where: { id: taskId as string, userId: req.userId! },
     });
 
     if (!task) return res.status(404).json({ error: 'Task not found' });

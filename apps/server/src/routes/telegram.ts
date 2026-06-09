@@ -214,7 +214,7 @@ async function handleDaily(user: any, chatId: number) {
     );
 
     // Send with "Mark Done" buttons
-    const buttons = aiResponse.problems.map((p, i) => ([{
+    const buttons = aiResponse.problems.map((p: any, i: number) => ([{
       text: `✅ Done: ${p.title}`,
       callback_data: `done_${i + 1}`,
     }]));

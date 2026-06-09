@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+apps/web/.next
+apps/web/out
+apps/web/node_modules
+apps/server/node_modules
+apps/server/dist
+.git
+.env
+*.md
+.turbo

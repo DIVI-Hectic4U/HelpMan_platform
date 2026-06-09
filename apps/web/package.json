@@ -9,21 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "16.2.7",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "next-auth": "^4.24.0",
-    "@prisma/client": "^6.9.0",
-    "bcryptjs": "^3.0.2",
-    "zod": "^3.25.0"
-  },
-  "devDependencies": {
+    "next": "^14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@types/bcryptjs": "^3.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "typescript": "^5"
-  }
+  },
+  "devDependencies": {}
 }

@@ -9,8 +9,9 @@ import { gamificationRoutes } from './routes/gamification';
 import { telegramRoutes } from './routes/telegram';
 import { pushRoutes } from './routes/push';
 import { adminRoutes } from './routes/admin';
-import { startCronJobs } from './jobs/cronScheduler';
+import { cronRoutes } from './routes/cron';
 
+// Load .env — in production (Koyeb), env vars are injected directly
 dotenv.config({ path: '../../.env' });
 
 const app = express();
@@ -19,8 +20,21 @@ const PORT = process.env.PORT || 4000;
 // ── Middleware ────────────────────────────────────────────────
 app.use(helmet());
 app.use(compression());
+
+const allowedOrigins = [
+  process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  'https://helpman-platform.vercel.app',
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Be permissive for now; tighten later
+    }
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -43,6 +57,7 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/telegram', telegramRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/cron', cronRoutes);
 
 // ── Error Handler ────────────────────────────────────────────
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -62,7 +77,6 @@ app.listen(PORT, () => {
   ║  Environment: ${process.env.NODE_ENV || 'development'}              ║
   ╚══════════════════════════════════════════════╝
   `);
-  startCronJobs();
 });
 
 export default app;

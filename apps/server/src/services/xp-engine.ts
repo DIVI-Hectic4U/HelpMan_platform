@@ -46,7 +46,7 @@ export async function awardXp(
       userId,
       amount: xpAwarded,
       reason,
-      metadata: metadata ? metadata : undefined,
+      metadata: metadata ? (metadata as any) : undefined,
     },
   });
 
