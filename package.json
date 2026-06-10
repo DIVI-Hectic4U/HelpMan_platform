@@ -5,7 +5,6 @@
   "description": "Gamified AI Placement Preparation Platform — AI-powered daily coding tasks via Telegram with XP, streaks, and leaderboards",
   "author": "Divyanshu",
   "license": "MIT",
-  "packageManager": "npm@10.8.2",
   "workspaces": [
     "apps/*",
     "packages/*"
