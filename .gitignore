@@ -42,3 +42,8 @@ coverage/
 *.tsbuildinfo
 
 .vercel
+
+# Test/debug scripts (may contain hardcoded keys)
+test_*.js
+check_*.js
+clear_*.js
