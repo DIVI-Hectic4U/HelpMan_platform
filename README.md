@@ -24,7 +24,7 @@
 - No motivation system to maintain consistency during stressful seasons
 
 ### The Solution
-- **AI Engine**: Groq (Llama 3.3) analyzes your ratings, weak topics, and history to generate 3 targeted coding problems and 2 theory reading tasks daily.
+- **AI Engine**: Groq (GPT OSS 120B) analyzes your ratings, weak topics, and history to generate 3 targeted coding problems and 2 theory reading tasks daily.
 - **Telegram Delivery**: Receive tasks right where you chat using our Telegram Bot
 - **Gamification**: XP with log-capped streak multipliers, rank progression (Bronze → Master), and competitive leaderboards
 
@@ -103,7 +103,7 @@ graph TD
 ### How the Magic Works (The `/daily` Command)
 1. **Trigger**: You send `/daily` to the Telegram Bot.
 2. **Data Gathering**: The Express backend instantly fetches your live Codeforces and LeetCode ratings.
-3. **AI Generation**: A structured prompt containing your ratings and weak topics is sent to the incredibly fast **Groq API** (running **Meta's Llama 3.3**).
+3. **AI Generation**: A structured prompt containing your ratings and weak topics is sent to the incredibly fast **Groq API** (running **GPT OSS 120B**).
 4. **Processing**: Groq returns 3 perfectly tailored coding problems and 2 CS theory reading tasks. The backend validates this and securely stores it in **PostgreSQL**.
 5. **Delivery**: The server formats the tasks into a rich message and delivers it back to you on Telegram.
 

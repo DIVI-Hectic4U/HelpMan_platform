@@ -15,7 +15,7 @@ interface UserProfile {
 }
 
 /**
- * Generate personalized daily coding tasks using Groq AI (Llama 3).
+ * Generate personalized daily coding tasks using Groq AI (GPT OSS 120B).
  * Returns validated, structured problem recommendations.
  * All URLs are verified against real APIs before returning.
  */
@@ -34,7 +34,7 @@ export async function generateDailyTasks(profile: UserProfile): Promise<AITaskRe
         { role: 'system', content: 'You are a competitive programming coach who knows thousands of obscure problems across Codeforces and LeetCode. You NEVER repeat recommendations. Every response must contain completely different problems.' },
         { role: 'user', content: prompt }
       ],
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       temperature: 0.9,       // High creativity for maximum diversity
       top_p: 0.95,            // Broader token sampling pool
       response_format: { type: 'json_object' }
